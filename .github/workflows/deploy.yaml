@@ -24,17 +24,14 @@ jobs:
           push: true
           tags: myintmyatdev/caloire-snap-user-svc:${{ github.sha }}
 
-      - name: Determine Target Environment & Branch
+      - name: Set Environment Variables
         run: |
-          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+          if [[ "${{ github.ref_name }}" == "main" ]]; then
             echo "ENV_NAME=prod" >> $GITHUB_ENV
-            echo "TARGET_BRANCH=main" >> $GITHUB_ENV
-          elif [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
+          elif [[ "${{ github.ref_name }}" == "staging" ]]; then
             echo "ENV_NAME=staging" >> $GITHUB_ENV
-            echo "TARGET_BRANCH=staging" >> $GITHUB_ENV
           else
             echo "ENV_NAME=testing" >> $GITHUB_ENV
-            echo "TARGET_BRANCH=testing" >> $GITHUB_ENV
           fi
 
       - name: Checkout Infra / GitOps Repo
@@ -43,13 +40,11 @@ jobs:
           repository: Geekzix/calorie-snap-infra
           token: ${{ secrets.INFRA_REPO_TOKEN }}
           path: infra-repo
-          ref: ${{ env.TARGET_BRANCH }}
+          ref: ${{ github.ref_name }}
 
-      - name: Update Helm values file tag in Infra Repo
-        uses: datamonsters/replace-action@v2
-        with:
-          files: 'infra-repo/helm/user-svc/values.yaml'
-          replacements: 'tag="${{ github.sha }}"'
+      - name: Update Helm values file tag using sed
+        run: |
+          sed -i 's/tag: .*/tag: "${{ github.sha }}"/' infra-repo/helm/user-svc/values.yaml
 
       - name: Commit and push updated image tag to Infra Repo
         uses: stefanzweifel/git-auto-commit-action@v5
