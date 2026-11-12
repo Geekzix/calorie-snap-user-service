@@ -48,7 +48,7 @@ jobs:
       - name: Update Helm values file tag in Infra Repo
         uses: datamonsters/replace-action@v2
         with:
-          files: 'calorie-snap-infra/helm/user-svc/values.yaml'
+          files: 'infra-repo/helm/user-svc/values.yaml'
           replacements: 'tag="${{ github.sha }}"'
 
       - name: Commit and push updated image tag to Infra Repo
