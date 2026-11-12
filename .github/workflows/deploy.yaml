@@ -47,9 +47,11 @@ jobs:
           sed -i 's/tag: .*/tag: "${{ github.sha }}"/' infra-repo/helm/user-svc/values.yaml
 
       - name: Commit and push updated image tag to Infra Repo
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          directory: infra-repo
-          file_pattern: helm/user-svc/values.yaml
-          commit_message: "chore(user-svc-${{ env.ENV_NAME }}): update image tag to ${{ github.sha }} [skip ci]"
-          branch: ${{ github.ref_name }}
+        run: |
+          cd infra-repo
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin https://x-access-token:${{ secrets.INFRA_REPO_TOKEN }}@github.com/Geekzix/calorie-snap-infra.git
+          git add helm/user-svc/values.yaml
+          git commit -m "chore(user-svc-${{ env.ENV_NAME }}): update image tag to ${{ github.sha }} [skip ci]" || echo "No changes to commit"
+          git push origin ${{ github.ref_name }}
