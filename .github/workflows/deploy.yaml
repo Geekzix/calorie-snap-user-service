@@ -54,6 +54,7 @@ jobs:
       - name: Commit and push updated image tag to Infra Repo
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          repository_path: infra-repo
+          directory: infra-repo
+          file_pattern: helm/user-svc/values.yaml
           commit_message: "chore(user-svc-${{ env.ENV_NAME }}): update image tag to ${{ github.sha }} [skip ci]"
-          branch: ${{ env.TARGET_BRANCH }}
+          branch: ${{ github.ref_name }}
