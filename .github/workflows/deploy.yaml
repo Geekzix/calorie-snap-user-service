@@ -49,7 +49,7 @@ jobs:
       - name: Commit and push updated image tag to Infra Repo
         run: |
           cd infra-repo
-          git config user.name "github-actions[bot]"
+          git config user.name "argocd-image-updater"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git remote set-url origin https://x-access-token:${{ secrets.INFRA_REPO_TOKEN }}@github.com/Geekzix/calorie-snap-infra.git
           git add helm/user-svc/values.yaml
